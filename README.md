@@ -25,7 +25,7 @@ Currently XenOS supports building on Windows, but we cannot promise compatibilit
 ### Instructions
 First, clone the repo
 ```sh
-$ git clone https://github.com/nebulaservices/xenos.git --recursive
+$ git clone https://github.com/scaratech/xenos.git --recursive
 $ cd xenos
 ```
 Install dependencies
@@ -52,13 +52,15 @@ pnpm start # or npm start
 ```
 
 ## Documentation
-Documentation about XenOS can be found [here!](./docs/README.md)
+- Documentation related to APIs can be found at https://docs.xen-os.dev
+  - This is an automatically generated TypeDoc build (at `src/`, so it includes ALL the XenOS code), you'll probably want see [this](https://docs.xen-os.dev/modules/xen.html) for a good API overview with JSDoc annotation
+- Other documentation can be found [here](./md_docs/README.md)
 
 ## Whats Left?
-You can view the projects TODO [here](https://github.com/NebulaServices/XenOS/blob/main/TODO.md)
+You can view the projects TODO [here](https://github.com/scaratech/XenOS/blob/main/TODO.md)
 
 ## I Found a Bug!!!!
-Cool! You can submit things like bug reports in our [Discord Server](https://discord.gg/unblocker), but please check if the bug has already been reported. You can check in the Discord or [here](./BUGS.md)
+First check [here](./BUGS.md) to see if the bug is already known or check existing GitHub issues, if not, then report it! (Using GitHub issues)
 
 ## Changelog
 The changelog can be found [here](./CHANGELOG.md)
@@ -67,21 +69,22 @@ The changelog can be found [here](./CHANGELOG.md)
 - [Scaratek](https://github.com/scaratech) - Lead developer
 - [Madjik](https://github.com/madjikdotpng) - Various UI tweaks and logo designer
 
+Contributions are very much welcome!! Even if it's just fixing my spelling :)
+
 ## Credit
 - The default wallpaper used: https://userstyles.org/styles/277430/font-change
 - The color scheme used: https://catppuccin.com/palette/ (mocha)
 - Major inspiration: [AnuraOS](https://anura.pro)
 
-## Dependencies used
-- [Workbox](https://developer.chrome.com/docs/workbox)
+## Dependencies Used
 - [Bare-Mux](https://github.com/mercuryworkshop/bare-mux)
 - [Ultraviolet](https://github.com/titaniumnetwork-dev/ultraviolet)
 - [Comlink](https://github.com/GoogleChromeLabs/comlink)
 - [JSZip](https://stuk.github.io/jszip/)
 - [libcurl.js](https://github.com/ading2210/libcurl.js)
 - [wisp-client-js](github.com/mercuryworkshop/wisp-client-js)
-  
-There are more dependencies used that are not listed here, for a full list, check the [package.json](https://github.com/NebulaServices/XenOS/blob/main/package.json)
+
+There are more dependencies used that are not listed here, for a full list, check the [package.json](https://github.com/scaratech/XenOS/blob/main/package.json)
 
 ## What Framework Do You Use?!?
 None! Just TypeScript and CSS :)

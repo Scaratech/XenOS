@@ -79,6 +79,24 @@ async function createSw() {
     await initSw();
 }
 
+function setupSj() {
+    //@ts-ignore
+    const { ScramjetController } = $scramjetLoadController();
+
+    const scramjet = new ScramjetController({
+        files: {
+            wasm: "/libs/sj/scramjet.wasm.wasm",
+            all: "/libs/sj/scramjet.all.js",
+            sync: "/libs/sj/scramjet.sync.js",
+        },
+    });
+
+
+    scramjet.init();
+    //@ts-ignore
+    window.scramjet = scramjet;
+}
+
 function createTransport() {
     const connection = new window.BareMux.BareMuxConnection('/libs/bare-mux/worker.js');
     //@ts-ignore
@@ -110,6 +128,7 @@ window.addEventListener('load', async () => {
     parseArgs();
     await setupXen();
     await isOobe();
+    setupSj();
     await createSw();
     createTransport();
     await window.xen.initSystem();

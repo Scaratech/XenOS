@@ -1,6 +1,10 @@
 function main() {
     const wispIn = document.getElementById("wisp-url");
     const saveWispBtn = document.getElementById("save-wisp-url");
+    const p2pIn = document.getElementById("p2p-url");
+    const saveP2pBtn = document.getElementById("save-p2p-url");
+    const proxySelect = document.getElementById("proxy-select");
+    const saveProxyBtn = document.getElementById("save-proxy");
     const updateBtn = document.getElementById("check-updates");
     const resetBtn = document.getElementById("reset-instance");
 
@@ -32,6 +36,12 @@ function main() {
         "://" +
         location.host +
         "/wisp/";
+    if (p2pIn) {
+        p2pIn.placeholder = (location.protocol === "https:" ? "wss" : "ws") +
+            "://" +
+            location.host +
+            "/p2p/";
+    }
 
     function resetPolicyEditor() {
         selectedPath = null;
@@ -397,10 +407,32 @@ function main() {
 
     try {
         const settings = parent.xen.settings.get("wisp-url");
+
         if (settings) {
             wispIn.value = settings;
         }
-    } catch (e) { }
+    } catch { }
+
+    try {
+        const p2p = parent.xen.settings.get("p2p-url");
+        if (p2p && p2pIn) {
+            p2pIn.value = p2p;
+        }
+    } catch { }
+
+    try {
+        let proxy = parent.xen.settings.get('proxy');
+
+        if (proxy !== 'uv' && proxy !== 'sj') {
+            proxy = 'uv';
+
+            try { 
+                parent.xen.settings.set('proxy', proxy); 
+            } catch { }
+        }
+
+        proxySelect.value = proxy;
+    } catch { }
 
     saveWispBtn.addEventListener("click", async () => {
         const url = wispIn.value.trim();
@@ -452,6 +484,69 @@ function main() {
             }
         }
     });
+
+    saveProxyBtn.addEventListener('click', () => {
+        const value = proxySelect.value === 'sj' ? 'sj' : 'uv';
+        try {
+            parent.xen.settings.set('proxy', value);
+            parent.xen.notifications.spawn({
+                title: 'XenOS',
+                description: `Proxy set to ${value === 'uv' ? 'Ultraviolet' : 'Scramjet'}`,
+                icon: `/assets/logo.svg`,
+                timeout: 2500,
+            });
+        } catch (e) {
+            parent.xen.notifications.spawn({
+                title: 'XenOS',
+                description: `Failed to set proxy: ${e.message}`,
+                icon: `/assets/logo.svg`,
+                timeout: 3000,
+            });
+        }
+    });
+
+    if (saveP2pBtn && p2pIn) {
+        saveP2pBtn.addEventListener('click', () => {
+            const url = p2pIn.value.trim();
+            if (url) {
+                try {
+                    parent.xen.settings.set('p2p-url', url);
+                    parent.xen.notifications.spawn({
+                        title: 'XenOS',
+                        description: `P2P URL set to: ${url}`,
+                        icon: `/assets/logo.svg`,
+                        timeout: 2500,
+                    });
+                } catch (e) {
+                    parent.xen.notifications.spawn({
+                        title: 'XenOS',
+                        description: `Failed to set P2P URL: ${e.message}`,
+                        icon: `/assets/logo.svg`,
+                        timeout: 3000,
+                    });
+                }
+            } else {
+                const defaultUrl = (location.protocol === 'https:' ? 'wss' : 'ws') + '://' + location.host + '/p2p/';
+                try {
+                    parent.xen.settings.set('p2p-url', defaultUrl);
+                    p2pIn.value = defaultUrl;
+                    parent.xen.notifications.spawn({
+                        title: 'XenOS',
+                        description: `P2P URL reset to default: ${defaultUrl}`,
+                        icon: `/assets/logo.svg`,
+                        timeout: 2500,
+                    });
+                } catch (e) {
+                    parent.xen.notifications.spawn({
+                        title: 'XenOS',
+                        description: `Failed to reset P2P URL: ${e.message}`,
+                        icon: `/assets/logo.svg`,
+                        timeout: 3000,
+                    });
+                }
+            }
+        });
+    }
 
     updateBtn.addEventListener("click", async () => {
         try {

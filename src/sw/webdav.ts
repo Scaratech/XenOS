@@ -126,6 +126,7 @@ export async function handleDavRequest(request: Request, url: URL): Promise<Resp
                 try {
                     const data = await fs.read(path, 'blob');
                     const stat = await fs.stat(path);
+                    //@ts-ignore
                     return new Response(method === "HEAD" ? null : data, {
                         headers: {
                             "Content-Type": stat.mime

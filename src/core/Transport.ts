@@ -56,6 +56,7 @@ export class XenTransport {
             (data: Blob | ArrayBuffer | string) => void,
             (code: number, reason: string) => void,
         ] {
+        //@ts-ignore
         const socket = new window.xen.net.WebSocket(url.toString(), protocols, {
             headers: requestHeaders,
         });

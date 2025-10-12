@@ -148,6 +148,14 @@ h2 {
     flex-wrap: wrap;
 }
 
+.input-group label {
+    width: 130px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    font-weight: 500;
+}
+
 label {
     white-space: nowrap;
     font-size: 1.05em;
@@ -155,7 +163,8 @@ label {
     flex-shrink: 0;
 }
 
-input[type='text'] {
+input[type='text'],
+select {
     flex-grow: 1;
     min-width: 150px;
     padding: 10px 15px;
@@ -170,9 +179,65 @@ input[type='text'] {
         box-shadow 0.2s ease;
 }
 
-input[type='text']:focus {
+input[type='text']:focus,
+select:focus {
     border-color: var(--ctp-pink);
     box-shadow: 0 0 0 3px rgba(245, 189, 230, 0.3);
+}
+
+select {
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    padding-right: 44px;
+    background-clip: padding-box;
+    font-family: inherit;
+    font-weight: 500;
+    position: relative;
+}
+
+select::-ms-expand {
+    display: none;
+}
+
+#proxy-select {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23cdd6f4'><path d='M7 10l5 5 5-5H7z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 16px 16px;
+    font-weight: 500;
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#proxy-select:hover {
+    border-color: var(--ctp-subtext0);
+    background-color: var(--ctp-surface1);
+}
+
+#proxy-select:focus {
+    border-color: var(--ctp-pink);
+    box-shadow: 0 0 0 3px rgba(245, 189, 230, 0.25);
+}
+
+input[type='text'], select, button {
+    line-height: 1.2;
+}
+
+select option {
+    background: var(--ctp-mantle);
+    color: var(--ctp-text);
+}
+
+@media (max-width: 768px) {
+    .input-group label {
+        width: auto;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #proxy-select {
+        transition: none;
+    }
 }
 
 button {

@@ -59,6 +59,10 @@ export class LibcurlClient {
             this.wispUrl = window.xen.settings.get('wisp-url');
         }
 
+        if (!window.xen.settings.get('proxy')) {
+            window.xen.settings.set('proxy', 'uv');
+        }
+
         const lcModule = await import(this.paths.lcJs);
         this.direct.libcurl = lcModule.libcurl;
         await this.direct.libcurl.load_wasm(this.paths.lcWasm);
@@ -174,8 +178,13 @@ export class LibcurlClient {
         if (u.startsWith(location.origin)) return u;
 
         if (u.startsWith("http://") || u.startsWith("https://")) {
-            // @ts-ignore
-            e = __uv$config.prefix + __uv$config.encodeUrl(u);
+            if (window.xen.settings.get('proxy') == 'uv') {
+                // @ts-ignore
+                e = __uv$config.prefix + __uv$config.encodeUrl(u);
+            } else if (window.xen.settings.get('proxy') == 'sj') {
+                //@ts-ignore
+                e = window.scramjet.encodeUrl(u);
+            }
         } else {
             e = u;
         }
@@ -184,10 +193,15 @@ export class LibcurlClient {
     }
 
     public decodeUrl(u: string): string {
-        //@ts-ignore
-        u = u.split(__uv$config.prefix)[1];
-        //@ts-ignore
-        u = __uv$config.decodeUrl(u);
+        if (window.xen.settings.get('proxy') == 'uv') {
+            //@ts-ignore
+            u = u.split(__uv$config.prefix)[1];
+            //@ts-ignore
+            u = __uv$config.decodeUrl(u);
+        } else if (window.xen.settings.get('proxy') == 'sj') {
+            //@ts-ignore
+            u = window.scramjet.decodeUrl(u);
+        }
 
         return u;
     }

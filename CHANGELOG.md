@@ -86,3 +86,8 @@ Migrated `xen.KV` to a library
 - Fixed the VSCode icon
 - Moved xen official repos to GitHub pages for CI/CD
 - Firewall app
+
+## `v1.3.1`
+- Scramjet added as an alternative to Ultraviolet
+    - Can be configured in settings
+- Ability to change P2P URL in settings

@@ -4,5 +4,6 @@ dist-sw/
 dist-transport/
 apps/
 build/
+docs/
 .vscode/
 p2p.json

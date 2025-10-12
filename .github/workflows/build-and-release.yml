@@ -1,141 +1,173 @@
-name: Build and Release XenOS
+name: XenOS CI / Release / Docs
 
 on:
   push:
-    tags:
-      - 'v*.*.*'
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
   workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
 
 jobs:
   build:
+    name: Build (verify)
     runs-on: ubuntu-latest
-    
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive
-        
-    - name: Install pnpm
-      uses: pnpm/action-setup@v2
-      with:
-        version: 8
-        
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'pnpm'
-        
-    - name: Install dependencies
-      run: pnpm install
-      
-    - name: Build XenOS
-      run: |
-        chmod +x ./scripts/build.sh
-        ./scripts/build.sh
-        
-    - name: Create build archive
-      run: |
-        cd build
-        zip -r ../xenos-build.zip ./*
-        cd ..
-        
-    - name: Generate release notes
-      run: |
-        echo "## XenOS Build $(date '+%Y-%m-%d %H:%M:%S')" > release-notes.md
-        echo "" >> release-notes.md
-        echo "### Changes" >> release-notes.md
-        echo "- Built from commit: \`${{ github.sha }}\`" >> release-notes.md
-        echo "- Branch: \`${{ github.ref_name }}\`" >> release-notes.md
-        echo "" >> release-notes.md
-        echo "### Installation" >> release-notes.md
-        echo "1. Download \`xenos-build.zip\`" >> release-notes.md
-        echo "2. Extract the archive" >> release-notes.md
-        echo "3. Serve the contents using a web server (e.g., \`npx serve\` or \`python -m http.server\`)" >> release-notes.md
-        echo "4. Open the served URL in your browser" >> release-notes.md
-        
-    - name: Create Release
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: ${{ github.ref_name }}
-        name: XenOS ${{ github.ref_name }}
-        body_path: release-notes.md
-        files: |
-          xenos-build.zip
-        draft: false
-        prerelease: false
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
-  build-dev:
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
+
+      - name: pnpm version
+        run: pnpm --version
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run build script
+        run: |
+          chmod +x ./scripts/build.sh
+          ./scripts/build.sh
+
+      - name: Archive production build
+        run: |
+          cd build
+          zip -r ../xenos-build.zip ./*
+          cd ..
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: xenos-build
+          path: xenos-build.zip
+          retention-days: 7
+
+  release:
+    name: Create/Update Main Release
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
-    
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        submodules: recursive
-        
-    - name: Install pnpm
-      uses: pnpm/action-setup@v2
-      with:
-        version: 8
-        
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'pnpm'
-        
-    - name: Install dependencies
-      run: pnpm install
-      
-    - name: Build XenOS
-      run: |
-        chmod +x ./scripts/build.sh
-        ./scripts/build.sh
-        
-    - name: Create build archive
-      run: |
-        cd build
-        zip -r ../xenos-dev-build.zip ./*
-        cd ..
-        
-    - name: Generate dev release notes
-      run: |
-        echo "## XenOS Development Build" > dev-release-notes.md
-        echo "" >> dev-release-notes.md
-        echo "**⚠️ This is a development build and may be unstable**" >> dev-release-notes.md
-        echo "" >> dev-release-notes.md
-        echo "### Build Info" >> dev-release-notes.md
-        echo "- Built from commit: \`${{ github.sha }}\`" >> dev-release-notes.md
-        echo "- Branch: \`dev\`" >> dev-release-notes.md
-        echo "- Build date: $(date '+%Y-%m-%d %H:%M:%S UTC')" >> dev-release-notes.md
-        echo "" >> dev-release-notes.md
-        echo "### Installation" >> dev-release-notes.md
-        echo "1. Download \`xenos-dev-build.zip\`" >> dev-release-notes.md
-        echo "2. Extract the archive" >> dev-release-notes.md
-        echo "3. Serve the contents using a web server (e.g., \`npx serve\` or \`python -m http.server\`)" >> dev-release-notes.md
-        echo "4. Open the served URL in your browser" >> dev-release-notes.md
-        
-    - name: Delete previous dev release
-      run: |
-        gh release delete dev-build --yes || true
-        git push --delete origin dev-build || true
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        
-    - name: Create Dev Release
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: dev-build
-        name: XenOS Development Build
-        body_path: dev-release-notes.md
-        files: |
-          xenos-dev-build.zip
-        draft: false
-        prerelease: true
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout (full history for tagging)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: xenos-build
+
+      - name: Force tag 'main' to this commit
+        run: |
+          git tag -f main $GITHUB_SHA
+          git push origin :refs/tags/main || true
+          git push origin refs/tags/main --force
+
+      - name: Generate release notes
+        run: |
+          echo "Commit: ${GITHUB_SHA}" > release-notes.md
+          echo "Ref: main" >> release-notes.md
+          echo "Built: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> release-notes.md
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: main
+          name: XenOS
+          body_path: release-notes.md
+          files: |
+            xenos-build.zip
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  docs:
+    name: Build & Package TypeDoc
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate TypeDoc site
+        run: pnpm typedoc
+
+      - name: Diagnose TypeDoc output
+        run: |
+          echo '--- TypeDoc top-level files (first 60) ---'
+          if [ -d docs ]; then find docs -maxdepth 2 -type f -printf '%P\n' | sort | head -60; else echo 'docs/ missing'; fi
+          if [ -f docs/index.html ]; then echo 'Found docs/index.html'; else echo 'MISSING docs/index.html'; fi
+          echo 'Docs directory size:'
+          du -sh docs || true
+
+      - name: Prepare docs publish dir
+        run: |
+          rm -rf site
+          if [ -d docs ]; then mv docs site; else mkdir site; fi
+          echo "docs.xen-os.dev" > site/CNAME
+          touch site/.nojekyll
+          if [ ! -f site/index.html ]; then echo "Expected TypeDoc index.html missing" >&2; exit 1; fi
+
+      - name: Upload TypeDoc artifact (debug)
+        uses: actions/upload-artifact@v4
+        with:
+          name: typedoc-site
+          path: site
+          retention-days: 3
+
+      - name: Upload pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy-docs:
+    name: Deploy TypeDoc to Pages
+    needs: docs
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -78,6 +78,7 @@ function copy_nm() {
 }
 
 copy_nm "@titaniumnetwork-dev/ultraviolet/dist" "libs/uv"
+copy_nm "@mercuryworkshop/scramjet/dist" "libs/sj"
 copy_nm "@mercuryworkshop/bare-mux/dist" "libs/bare-mux"
 copy_nm "libcurl.js" "libs/libcurl-js"
 copy_nm "comlink/dist" "libs/comlink"

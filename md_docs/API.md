@@ -1,3 +1,7 @@
+> [!WARNING]
+> This information could potentially be wrong, outdated, or flat out bad.
+> Please use https://docs.xen-os.dev
+
 # XenOS APIs
 Documentation covering (most) of the XenOS APIs
 - Notice: some APIs aren't very useful, so they haven't been documented, but they could be useful to you! If you're looking for a niche feature it *probably* exists but you'll after to read some code.

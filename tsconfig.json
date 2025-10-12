@@ -12,7 +12,8 @@
             "dom.iterable",
             "webworker",
             "webworker.importscripts"
-        ]
+        ],
+        "skipLibCheck": true
     },
     "include": [
         "src"

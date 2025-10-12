@@ -3,6 +3,7 @@ import { getOpfsRoot, download, preCache } from "./bootstrap";
 import { Shared } from "../types";
 import { handleDavRequest } from "./webdav";
 import * as mime from "mime";
+import path from "path";
 
 declare const Comlink: any;
 declare const UVServiceWorker: any;
@@ -22,7 +23,8 @@ importScripts(
     "/libs/comlink/umd/comlink.min.js",
     "/libs/uv/uv.bundle.js",
     "/uv/uv.config.js",
-    "/libs/uv/uv.sw.js"
+    "/libs/uv/uv.sw.js",
+    "/libs/sj/scramjet.all.js"
 );
 
 async function checkBs() {
@@ -176,75 +178,89 @@ async function handleShowFilePicker(url: URL): Promise<Response> {
     });
 }
 
+//@ts-ignore
+const { ScramjetServiceWorker } = $scramjetLoadWorker();
+const scramjet = new ScramjetServiceWorker();
+
+const uv = new UVServiceWorker();
+
 self.addEventListener("fetch", (event) => {
-    const url = new URL(event.request.url);
-    const pathname = url.pathname;
+    const responsePromise = (async () => {
+        const url = new URL(event.request.url);
+        const pathname = url.pathname;
 
-    if (pathname.startsWith("/uvp/")) {
-        //@ts-ignore
-        const uv = new UVServiceWorker();
-        event.respondWith(uv.fetch(event));
-        return;
-    }
+        try {
+            // @ts-ignore
+            await scramjet.loadConfig();
+        } catch (err) {
+            console.error("[SW] Failed to load SJ config: ", err);
+        }
 
-    if (pathname.startsWith("/fs/")) {
-        event.respondWith(serveOPFS(event.request.url));
-        return;
-    }
+        
+        if (pathname.startsWith("/uvp/")) {
+            return uv.fetch(event);
+        }
 
-    if (pathname.startsWith("/showFilePicker")) {
-        event.respondWith(handleShowFilePicker(url));
-        return;
-    }
+        if (pathname.startsWith("/scramjet/")) {
+            return scramjet.fetch(event);
+        }
 
-    if (pathname.startsWith("/dav/")) {
-        event.respondWith(handleDavRequest(event.request, url));
-        return;
-    }
+        if (pathname.startsWith("/fs/")) {
+            return serveOPFS(event.request.url);
+        }
 
-    event.respondWith(
-        (async () => {
-            if (url.origin !== self.location.origin) {
-                return fetch(event.request);
+        if (pathname.startsWith("/showFilePicker")) {
+            return handleShowFilePicker(url);
+        }
+
+        if (pathname.startsWith("/dav/")) {
+            return handleDavRequest(event.request, url);
+        }
+
+        if (url.origin !== self.location.origin) {
+            return fetch(event.request);
+        }
+
+        let localPath = pathname === "/" ? "/index.html" : pathname;
+        const root = await getOpfsRoot();
+        const opfsPath = `system${localPath}`;
+
+        try {
+            const parts = opfsPath.split("/").filter((p) => p.length > 0);
+            const fileName = parts.pop();
+
+            let currentDir = root;
+
+            for (const part of parts) {
+                currentDir = await currentDir.getDirectoryHandle(part);
             }
 
-            let localPath = pathname === "/" ? "/index.html" : pathname;
-            const root = await getOpfsRoot();
-            const opfsPath = `system${localPath}`;
+            const fileHandle = await currentDir.getFileHandle(fileName);
+            const file = await fileHandle.getFile();
+
+            return new Response(file, {
+                status: 200,
+                headers: { "Content-Type": file.type || "application/octet-stream" }
+            });
+        } catch {
+            const response = await fetch(localPath);
+            if (!response.ok) return response;
 
             try {
-                const parts = opfsPath.split("/").filter((p) => p.length > 0);
-                const fileName = parts.pop();
-                let currentDir = root;
+                const s = await checkBs();
 
-                for (const part of parts) {
-                    currentDir = await currentDir.getDirectoryHandle(part);
+                if (s != 'false') {
+                    await download(localPath, response.clone());
                 }
-
-                const fileHandle = await currentDir.getFileHandle(fileName);
-                const file = await fileHandle.getFile();
-
-                return new Response(file, {
-                    status: 200,
-                    headers: {
-                        "Content-Type": file.type || "application/octet-stream"
-                    }
-                });
-            } catch {
-                const response = await fetch(localPath);
-                if (!response.ok) return response;
-
-                try {
-                    const s = await checkBs();
-                    if (s != 'false') await download(localPath, response.clone());
-                } catch (err) {
-                    console.warn('Bootstrap check or download failed:', err);
-                }
-
-                return response;
+            } catch (err) {
+                console.warn('Bootstrap check or download failed:', err);
             }
-        })()
-    );
+
+            return response;
+        }
+    })();
+
+    event.respondWith(responsePromise);
 });
 
 async function init() {
