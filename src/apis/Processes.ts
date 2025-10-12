@@ -33,7 +33,6 @@ export class ProcessManager {
             return res.text();
         }
 
-        // XenFS
         return window.xen.fs.read(opts.content, 'text') as Promise<string>;
     }
 
@@ -42,7 +41,6 @@ export class ProcessManager {
         const src = await this.loadContent(opts);
         const html = `
 <script>
-    window.__PID__ = ${pid}
     window.xen = parent.xen
 </script>
 <script${opts.async ? ' type="module"' : ''}>
@@ -55,6 +53,7 @@ ${src}
         ifr.sandbox.value = 'allow-scripts allow-same-origin';
         ifr.style.display = 'none';
         ifr.src = url;
+        ifr.setAttribute('xen-pid', String(pid));
 
         document.body.appendChild(ifr);
 
@@ -76,6 +75,12 @@ ${src}
         if (p && p.status === 'running') {
             if (!p.associatedWindows) {
                 p.associatedWindows = new Set();
+            }
+
+            const win = window.xen.wm.windows.find(w => w.id === windowId);
+
+            if (win && win.el.content instanceof HTMLIFrameElement) {
+                win.el.content.setAttribute('xen-pid', String(pid));
             }
     
             p.associatedWindows.add(windowId);
@@ -102,13 +107,12 @@ ${src}
 
             window.xen.wm.windows.forEach(win => {
                 if (win.el.content instanceof HTMLIFrameElement) {
-                    try {
-                        const cw = win.el.content.contentWindow;
-                        if (cw && (cw as any).__PID__ === pid) {
-                            win.closeCbs = [];
-                            win.close();
-                        }
-                    } catch { }
+                    const framePid = win.el.content.getAttribute('xen-pid');
+
+                    if (framePid !== null && Number(framePid) === pid) {
+                        win.closeCbs = [];
+                        win.close();
+                    }
                 }
             });
 

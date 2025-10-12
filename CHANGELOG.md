@@ -91,3 +91,6 @@ Migrated `xen.KV` to a library
 - Scramjet added as an alternative to Ultraviolet
     - Can be configured in settings
 - Ability to change P2P URL in settings
+
+## `v1.3.2`
+- PID is now tracked by a `xen-pid` attribute given to process elements instead of injecting `window.__PID__` into each process

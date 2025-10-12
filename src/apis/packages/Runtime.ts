@@ -39,15 +39,20 @@ export class Runtime {
                     resizable: ${resizable},
                     xenFilePicker: ${xenFilePicker}
                 });
-                
-                if (window.__PID__ !== undefined) {
-                    window.xen.process.associateWindow(window.__PID__, win.id);
+                const frameEl = window.frameElement;
+                const pidAttr = frameEl ? frameEl.getAttribute('xen-pid') : null;
+                const pid = pidAttr ? parseInt(pidAttr, 10) : NaN;
+
+                if (!Number.isNaN(pid)) {
+                    window.xen.process.associateWindow(pid, win.id);
+
+                    if (win.el.content instanceof HTMLIFrameElement) {
+                        win.el.content.setAttribute('xen-pid', String(pid));
+                    }
                     
-                    win.onClose((closingWin) => {
+                    win.onClose(() => {
                         setTimeout(() => {
-                            if (window.__PID__ !== undefined) {
-                                window.xen.process.kill(window.__PID__);
-                            }
+                            window.xen.process.kill(pid);
                         }, 0);
                     });
                 }

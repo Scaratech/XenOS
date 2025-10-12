@@ -75,9 +75,39 @@ class TaskManager {
         return `${seconds}s ago`;
     }
 
+    getProcessFrame(pid) {
+        try {
+            if (!parent || !parent.document) return null;
+            return parent.document.querySelector(`iframe[xen-pid="${pid}"]`);
+        } catch {
+            return null;
+        }
+    }
+
+    getDisplayPid(pid) {
+        const frame = this.getProcessFrame(pid);
+        if (!frame) return String(pid);
+
+        const attr = frame.getAttribute('xen-pid');
+        return attr || String(pid);
+    }
+
+    resolvePid(pid) {
+        const frame = this.getProcessFrame(pid);
+        if (!frame) return pid;
+
+        const attr = frame.getAttribute('xen-pid');
+        if (!attr) return pid;
+
+        const parsed = parseInt(attr, 10);
+        return Number.isNaN(parsed) ? pid : parsed;
+    }
+
     killProcess(pid) {
         if (!this.pm) return;
-        this.pm.kill(pid);
+        const resolvedPid = this.resolvePid(pid);
+
+        this.pm.kill(resolvedPid);
         this.refresh();
     }
 
@@ -120,7 +150,7 @@ class TaskManager {
 
         tbody.innerHTML = processes.map(proc => `
             <div class="process-row">
-                <div class="col pid">${proc.pid}</div>
+                <div class="col pid">${this.getDisplayPid(proc.pid)}</div>
                 <div class="col status">
                     <span class="status-badge status-${proc.status}">
                         ${proc.status}
