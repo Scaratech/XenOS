@@ -1,7 +1,3 @@
-> [!WARNING]
-> This repository has been archived and moved to https://github.com/scaratech/XenOS
-
-# Old README
 <h1>
   <img src="./assets/logo.svg" width="32px" height="32px">
   <strong><a href="https://xen-os.dev">XenOS</a></strong>
