@@ -1,3 +1,6 @@
 [submodule "wisp-client-js"]
-	path = wisp-client-js
-	url = https://github.com/MercuryWorkshop/wisp-client-js
+    path = wisp-client-js
+    url = https://github.com/MercuryWorkshop/wisp-client-js
+[submodule "public/chii"]
+	path = public/chii
+	url = https://github.com/nebulaservices/chii-dist
