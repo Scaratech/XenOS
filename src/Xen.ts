@@ -60,11 +60,11 @@ export class Xen {
 
     public version = {
         prefix: 'XenOS',
-        codename: 'Neverland',
-        major: 2,
-        minor: 0,
-        patch: 0,
-        channel: 'Alpha',
+        codename: 'Nightcord',
+        major: 1,
+        minor: 3,
+        patch: 4,
+        channel: 'Beta',
         build: '',
         pretty: ''
     };

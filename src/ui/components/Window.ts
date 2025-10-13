@@ -142,24 +142,12 @@ export class Window {
             this.el.content.setAttribute("allowfullscreen", "true");
 
             this.el.window.appendChild(this.el.content);
-            (this.el.content as HTMLIFrameElement).src = window.xen.net.encodeUrl(
-                this.props.url,
-            );
 
-            this.el.content.onload = () => {
-                const iframe = (this.el.content as HTMLIFrameElement);
+            const iframe = this.el.content as HTMLIFrameElement;
 
-                Object.assign(iframe.contentWindow, {
-                    xen: window.xen
-                });
+            this.bridgeIframeContext(iframe);
 
-                if (this.props.xenFilePicker == true) {
-                    //@ts-ignore
-                    iframe.contentWindow.window.showOpenFilePicker = window.xen.polyfill.sofp;
-                    //@ts-ignore
-                    iframe.contentWindow.window.showDirectoryPicker = window.xen.polyfill.sdp;
-                }
-            };
+            iframe.src = window.xen.net.encodeUrl(this.props.url);
         } else if (this.props.content) {
             const d = document.createElement("div");
 
@@ -169,6 +157,40 @@ export class Window {
             this.el.content = d;
             this.el.window.appendChild(this.el.content);
         }
+    }
+
+    private bridgeIframeContext(iframe: HTMLIFrameElement): void {
+        const applyBridge = () => {
+            const target = iframe.contentWindow;
+            if (!target) {
+                return;
+            }
+
+            try {
+                Object.defineProperty(target, "xen", {
+                    configurable: true,
+                    enumerable: false,
+                    get() {
+                        return window.xen;
+                    },
+                    set(value) {
+                        window.xen = value;
+                    },
+                });
+            } catch (err) {
+                (target as any).xen = window.xen;
+            }
+
+            if (this.props.xenFilePicker === true) {
+                //@ts-ignore
+                target.window.showOpenFilePicker = window.xen.polyfill.sofp;
+                //@ts-ignore
+                target.window.showDirectoryPicker = window.xen.polyfill.sdp;
+            }
+        };
+
+        applyBridge();
+        iframe.addEventListener("load", () => applyBridge());
     }
 
     private applyProps(): void {

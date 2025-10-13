@@ -41,7 +41,25 @@ export class ProcessManager {
         const src = await this.loadContent(opts);
         const html = `
 <script>
-    window.xen = parent.xen
+    (() => {
+        const parentWin = window.parent;
+        if (!parentWin) return;
+
+        try {
+            Object.defineProperty(window, 'xen', {
+                configurable: true,
+                enumerable: false,
+                get() {
+                    return parentWin.xen;
+                },
+                set(value) {
+                    parentWin.xen = value;
+                }
+            });
+        } catch (err) {
+            window.xen = parentWin.xen;
+        }
+    })();
 </script>
 <script${opts.async ? ' type="module"' : ''}>
 ${src}
