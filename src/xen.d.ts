@@ -1565,6 +1565,28 @@ declare namespace XenOS {
         focus(window: XenWindow, zIndex?: number): void;
     }
 
+    interface HookInvocation<T extends (...args: any[]) => any> {
+        readonly fn: T;
+        call(args?: Parameters<T>, thisArg?: unknown): ReturnType<T>;
+        apply(thisArg?: unknown, args?: Parameters<T>): ReturnType<T>;
+        run(): ReturnType<T>;
+    }
+
+    type HookHandler<T extends (...args: any[]) => any> = (
+        original: HookInvocation<T>,
+        args: Parameters<T>,
+        context: unknown
+    ) => ReturnType<T>;
+
+    class Hook<T extends (...args: any[]) => any> {
+        constructor(target: T);
+        hook: HookHandler<T>;
+        clone(): T;
+        override(): T;
+        cloneObj(): Record<string | symbol, any>;
+        new(): Xen;
+    }
+
     // Main Xen class that exposes all APIs
     
     /**
@@ -1647,10 +1669,13 @@ declare namespace XenOS {
         
         /** XenShell terminal */
         shell: any;
-        
+
         /** URI handling API */
         uri: URI;
-        
+
+        /** Hook utility class */
+        Hook: typeof Hook;
+
         /** Version information */
         version: {
             /** OS name prefix */

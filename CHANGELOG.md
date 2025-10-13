@@ -94,3 +94,6 @@ Migrated `xen.KV` to a library
 
 ## `v1.3.2`
 - PID is now tracked by a `xen-pid` attribute given to process elements instead of injecting `window.__PID__` into each process
+
+## `v1.3.3`
+- New `Hook` API that allows you to "hook" functions or methods, see docs for more info

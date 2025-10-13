@@ -185,6 +185,48 @@ Exports the entire XenFS as a ZIP archive
 ### `await xen.fs.import(): Promise<void>`
 Imports a ZIP archive from your host FS and replaces the current XenFS with the decompressed uploaded ZIP archive
 
+## `xen.Hook`
+Utility class for "hooking" functions or methods
+
+```ts
+const hook = new xen.Hook(window.xen.net.fetch); // Target you want to hook
+
+hook.hook = (og, args) => {
+    // og = original function/method (Ex. window.xen.net.fetch)
+    // args = function/method args (Ex. [url, opts])
+    console.log(`URL: ${args[0]}`);
+    return og.call(args);
+};
+
+const hookedFetch = hook.clone(); // Create a reference to that hooked function/method
+await hookedFetch('https://example.com');
+/*
+    URL: https://example.com
+    Response {status: 200, url: 'https://example.com/', redirected: false, ok: true, blob: ƒ, …}
+*/
+
+const hookedNet = hook.cloneObj(); // This will create a new instance of the object or class the method/function belongs to (Ex. xen.net);
+await hookedNet.fetch('https://example.com');
+/*
+    URL: https://example.com
+    Response {status: 200, url: 'https://example.com/', redirected: false, ok: true, blob: ƒ, …}
+*/
+
+const hookedXen = hook.new(); // Create a new instance of xen with the hooked function/method
+await hookedXen.net.fetch('https://example.com');
+/*
+    URL: https://example.com
+    Response {status: 200, url: 'https://example.com/', redirected: false, ok: true, blob: ƒ, …}
+*/
+
+hook.override(); // Override the target with the hooked version
+await xen.net.fetch('https://example.com');
+/*
+    URL: https://example.com
+    Response {status: 200, url: 'https://example.com/', redirected: false, ok: true, blob: ƒ, …}
+*/
+```
+
 ## `xen.net`
 The versatile networking client for XenOS
 

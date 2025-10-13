@@ -22,6 +22,7 @@ import { updater } from "./core/update";
 import { platform } from "./apis/platform";
 import { XenShell } from "./apis/shell/XenShell";
 import { URI } from "./apis/URI";
+import { Hook } from "./apis/Hook";
 
 export class Xen {
     public settings: typeof settings = settings;
@@ -55,13 +56,14 @@ export class Xen {
     public platform: typeof platform = platform;
     public shell: typeof XenShell = XenShell;
     public uri: URI = new URI();
+    public Hook: typeof Hook = Hook;
 
     public version = {
         prefix: 'XenOS',
         codename: 'Nightcord',
         major: 1,
         minor: 3,
-        patch: 2,
+        patch: 3,
         channel: 'Beta',
         build: '',
         pretty: ''
