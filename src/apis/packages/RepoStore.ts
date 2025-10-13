@@ -1,17 +1,9 @@
 import { repoHandler } from '../policy/handler';
 
-interface Maintainer {
-	name?: string;
-	email?: string;
-	website?: string;
-	repo?: string;
-}
-
 interface RepoManifest {
 	title: string;
 	description: string;
 	version: string;
-	maintainer?: Maintainer;
 	packages: string[];
 }
 
@@ -21,7 +13,6 @@ interface PackageManifest {
 	type: 'app' | 'lib';
 	version: string;
 	icon: string;
-	maintainer?: Maintainer;
 }
 
 interface RepoSettingsStore {

@@ -29,12 +29,6 @@ interface Manifest {
     */
     source: string; // See above
 
-    maintainer?: { // Optinal information about you (the developer!)
-        name?: string;
-        email?: string;
-        website?: string;
-    }
-
     window?: { // Optional customizability about the window
         width?: string;
         height?: string;

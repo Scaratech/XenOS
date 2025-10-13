@@ -5,11 +5,6 @@
     "source": "index.html",
     "title": "About XenOS",
     "icon": "logo.svg",
-    "maintainer": {
-        "name": "Nebula Services",
-        "email": "contact@nebulaservices.org",
-        "website": "https://nebulaservices.org"
-    },
     "window": {
         "width": "451px",
         "height": "350px",

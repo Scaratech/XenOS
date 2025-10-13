@@ -2,31 +2,43 @@ import { Runtime } from './Runtime';
 import { packageHandler } from '../policy/handler';
 import JSZip from 'jszip';
 
+/*
+    Included = contextMenu,dialog,notifications,platform,systray,uri,version
+    Excluded = Hook,initSystem,taskBar,update
+
+    fs = FilePicker,fs,polyfill
+    vfs = FileSystem,VFS,vfs
+    net = net,p2p
+    packages
+    policy
+    process
+    repos
+    settings
+    shell
+    wallpaper
+    wm
+*/
+
+export type DefaultPermissions = 'contextMenu' | 'dialog' | 'notifications' | 'platform' | 'systray' | 'uri' | 'version';
+export type DeclaredPermissions = 'files' | 'networking' | 'vfs' | 'packages' | 'policy' | 'process' | 'repos' | 'settings' | 'shell' | 'wallpaper' | 'wm';
+export type DeniedPermissions = 'Hook' | 'initSystem' | 'taskBar' | 'update';
+
 export interface Manifest {
     id: string;
     version: string;
-
     title?: string;
     description?: string;
     icon?: string;
-
     type: 'webview' | 'app' | 'process' | 'library';
     source: string;
-
-    maintainer?: {
-        name?: string;
-        email?: string;
-        website?: string;
-    }
-
     window?: {
         width?: string;
         height?: string;
         resizable?: boolean;
         xenFilePicker?: boolean;
     };
-
-    installHook?: string
+    installHook?: string;
+    permissions?: DeclaredPermissions[];
 }
 
 interface AnuraManifest {

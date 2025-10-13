@@ -427,12 +427,6 @@ interface XenManifest {
     type: 'webview' | 'app' | 'process' | 'library';
     source: string;
 
-    maintainer?: {
-        name?: string;
-        email?: string;
-        website?: string;
-    }
-
     window?: {
         width?: string;
         height?: string;
@@ -571,18 +565,10 @@ API for interacting with XenOS repos and Anura repos
 
 ### Types
 ```ts
-interface Maintainer {
-	name?: string;
-	email?: string;
-	website?: string;
-	repo?: string;
-}
-
 interface RepoManifest {
 	title: string;
 	description: string;
 	version: string;
-	maintainer?: Maintainer;
 	packages: string[];
 }
 
@@ -592,7 +578,6 @@ interface PackageManifest {
 	type: 'app' | 'lib';
 	version: string;
 	icon: string;
-	maintainer?: Maintainer;
 }
 
 interface RepoSettingsStore {

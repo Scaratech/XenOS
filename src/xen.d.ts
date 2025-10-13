@@ -241,20 +241,6 @@ declare namespace XenOS {
     }
 
     /**
-     * Package maintainer information
-     */
-    interface Maintainer {
-        /** Maintainer name */
-        name?: string;
-        /** Maintainer email */
-        email?: string;
-        /** Maintainer website */
-        website?: string;
-        /** Maintainer repository */
-        repo?: string;
-    }
-
-    /**
      * XenOS package manifest
      */
     interface XenManifest {
@@ -272,8 +258,6 @@ declare namespace XenOS {
         type: 'webview' | 'app' | 'process' | 'library';
         /** Main source file */
         source: string;
-        /** Package maintainer information */
-        maintainer?: Maintainer;
         /** Window configuration for apps */
         window?: {
             /** Default window width */
@@ -320,8 +304,6 @@ declare namespace XenOS {
         title: string;
         /** Repository description */
         description?: string;
-        /** Repository maintainer */
-        maintainer?: Maintainer;
         /** Array of package IDs in this repository */
         packages: string[];
     }
@@ -336,8 +318,6 @@ declare namespace XenOS {
         version: string;
         /** Package description */
         description?: string;
-        /** Package maintainer */
-        maintainer?: Maintainer;
     }
 
     /**
