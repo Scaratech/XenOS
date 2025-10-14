@@ -1558,13 +1558,13 @@ declare namespace XenOS {
         context: unknown
     ) => ReturnType<T>;
 
-    class Hook<T extends (...args: any[]) => any> {
-        constructor(target: T);
-        hook: HookHandler<T>;
-        clone(): T;
-        override(): T;
-        cloneObj(): Record<string | symbol, any>;
-        new(): Xen;
+    class Hook<T extends (...args: any[]) => any = (...args: any[]) => any> {
+        constructor();
+        createHook<TFn extends (...args: any[]) => any = T>(target: TFn, handler: HookHandler<TFn>): TFn;
+        getHook<TFn extends (...args: any[]) => any = T>(target: TFn): TFn;
+        getObj<TObj extends Record<string | symbol, any>>(target: TObj): TObj;
+        override<TFn extends (...args: any[]) => any = T>(target: TFn): TFn;
+        deleteHook<TFn extends (...args: any[]) => any = T>(target: TFn): void;
     }
 
     // Main Xen class that exposes all APIs
