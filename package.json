@@ -10,14 +10,14 @@
 		"typedoc": "npx typedoc --entryPointStrategy Expand src"
 	},
 	"devDependencies": {
+		"@mercuryworkshop/wisp-js": "^0.4.0",
 		"@types/node": "^24.0.3",
 		"@types/wicg-file-system-access": "^2023.10.6",
 		"esbuild": "^0.25.5",
 		"express": "^5.1.0",
 		"typedoc": "^0.28.13",
 		"typescript": "^5.8.3",
-		"uuid": "^11.1.0",
-		"wisp-server-node": "^1.1.7"
+		"uuid": "^11.1.0"
 	},
 	"dependencies": {
 		"@mercuryworkshop/bare-mux": "^2.1.7",

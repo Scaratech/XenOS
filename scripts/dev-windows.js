@@ -2,7 +2,7 @@ import { spawn } from 'node:child_process';
 import { watch } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'url';
-import wisp from 'wisp-server-node';
+import { server as wisp } from "@mercuryworkshop/wisp-js/server";
 import p2p from './p2p.js';
 import express from 'express';
 import http from 'http';

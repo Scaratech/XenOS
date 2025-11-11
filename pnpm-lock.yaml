@@ -33,6 +33,9 @@ importers:
         specifier: ^8.18.0
         version: 8.18.3(bufferutil@4.0.9)(utf-8-validate@6.0.5)
     devDependencies:
+      '@mercuryworkshop/wisp-js':
+        specifier: ^0.4.0
+        version: 0.4.0(utf-8-validate@6.0.5)
       '@types/node':
         specifier: ^24.0.3
         version: 24.7.2
@@ -54,9 +57,6 @@ importers:
       uuid:
         specifier: ^11.1.0
         version: 11.1.0
-      wisp-server-node:
-        specifier: ^1.1.7
-        version: 1.1.7
 
 packages:
 
@@ -226,6 +226,10 @@ packages:
     resolution: {tarball: https://github.com/MercuryWorkshop/scramjet/releases/download/latest/mercuryworkshop-scramjet-2.0.0-alpha.tgz}
     version: 2.0.0-alpha
 
+  '@mercuryworkshop/wisp-js@0.4.0':
+    resolution: {integrity: sha512-rtUSxW8krWS5RGtcFomnoQl/9nrsDnUh7duPcJeQtIqnt5txB7AZJEa6N87CD7UXJzCZVijr1mUHwZy0kHJ+fQ==}
+    hasBin: true
+
   '@shikijs/engine-oniguruma@3.13.0':
     resolution: {integrity: sha512-O42rBGr4UDSlhT2ZFMxqM7QzIU+IcpoTMzb3W7AlziI1ZF7R8eS2M0yt5Ry35nnnTX/LTLXFPUjRFCIW+Operg==}
 
@@ -299,6 +303,10 @@ packages:
 
   comlink@4.4.2:
     resolution: {integrity: sha512-OxGdvBmJuNKSCMO4NTl1L47VRp6xn2wG4F/2hYzB6tiCb709otOxtEYCSvK80PtjODfXXZu8ds+Nw5kVCjqd2g==}
+
+  commander@14.0.2:
+    resolution: {integrity: sha512-TywoWNNRbhoD0BXs1P3ZEScW8W5iKrnbithIl0YH+uCmBd0QpPOA8yc82DS3BIE5Ma6FnBVUsJ7wVUDz4dvOWQ==}
+    engines: {node: '>=20'}
 
   content-disposition@1.0.0:
     resolution: {integrity: sha512-Au9nRL8VNUut/XSzbQA38+M78dzP4D+eqg3gfJHMIHHYa3bg067xj1KxMUWj+VULbiZMowKngFFbKczUrNJ1mg==}
@@ -470,6 +478,10 @@ packages:
   ipaddr.js@1.9.1:
     resolution: {integrity: sha512-0KI/607xoxSToH7GjN1FfSbLoU0+btTicjsQSWQlh/hZykN8KpmMf7uYwPW3R+akZ6R/w18ZlXSHBYXiYUPO3g==}
     engines: {node: '>= 0.10'}
+
+  ipaddr.js@2.2.0:
+    resolution: {integrity: sha512-Ag3wB2o37wslZS19hZqorUnrnzSkpOVy+IiiDEiTqNubEYpYuHWIf6K4psgN2ZWKExS4xhVCrRVfb/wfW8fWJA==}
+    engines: {node: '>= 10'}
 
   is-ip@5.0.1:
     resolution: {integrity: sha512-FCsGHdlrOnZQcp0+XT5a+pYowf33itBalCl+7ovNXC/7o5BhIpG14M3OrpPPdBSIQJCm+0M5+9mO7S9VVTTCFw==}
@@ -715,9 +727,6 @@ packages:
     resolution: {integrity: sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==}
     engines: {node: '>= 0.8'}
 
-  wisp-server-node@1.1.7:
-    resolution: {integrity: sha512-1kL4dbGAZLHks3qYQDOzhxFKvmKwPwfMFTskvsdOc2YA6TmUKZvq5TNPkGs9JJXPnWiOtqMzAVQVC/FwixxXvQ==}
-
   wrappy@1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
 
@@ -839,6 +848,15 @@ snapshots:
       parse-domain: 8.2.2
       set-cookie-parser: 2.7.1
 
+  '@mercuryworkshop/wisp-js@0.4.0(utf-8-validate@6.0.5)':
+    dependencies:
+      bufferutil: 4.0.9
+      commander: 14.0.2
+      ipaddr.js: 2.2.0
+      ws: 8.18.3(bufferutil@4.0.9)(utf-8-validate@6.0.5)
+    transitivePeerDependencies:
+      - utf-8-validate
+
   '@shikijs/engine-oniguruma@3.13.0':
     dependencies:
       '@shikijs/types': 3.13.0
@@ -931,6 +949,8 @@ snapshots:
       is-regexp: 3.1.0
 
   comlink@4.4.2: {}
+
+  commander@14.0.2: {}
 
   content-disposition@1.0.0:
     dependencies:
@@ -1136,6 +1156,8 @@ snapshots:
   ip-regex@5.0.0: {}
 
   ipaddr.js@1.9.1: {}
+
+  ipaddr.js@2.2.0: {}
 
   is-ip@5.0.1:
     dependencies:
@@ -1381,18 +1403,13 @@ snapshots:
   utf-8-validate@6.0.5:
     dependencies:
       node-gyp-build: 4.8.4
+    optional: true
 
   util-deprecate@1.0.2: {}
 
   uuid@11.1.0: {}
 
   vary@1.1.2: {}
-
-  wisp-server-node@1.1.7:
-    dependencies:
-      bufferutil: 4.0.9
-      utf-8-validate: 6.0.5
-      ws: 8.18.3(bufferutil@4.0.9)(utf-8-validate@6.0.5)
 
   wrappy@1.0.2: {}
 
