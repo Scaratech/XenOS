@@ -16,6 +16,7 @@ XenOS is a highly customizable "WebOS" with **a ton** of features and a sleek UI
 - NPM (PNPM is **strongly** recommended)
 - Git
 - `uuidgen`
+- `zip` & `unzip`
 
 Currently XenOS supports building on Windows, but we cannot promise compatibility forever. We recommended using WSL
 ### Instructions
